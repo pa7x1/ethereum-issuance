@@ -29,42 +29,29 @@ $$s + h = t$$
 
 After staking for certain period of time, we will reach a new situation $s' + h' = t'$. Where $s'$ and $t'$ have been inflated by the new issuance $i$ are obviously related to the nominal staking yield $y_s$:
 
-$$
-s' = s + i = s \cdot y_s
-$$
-$$
-h' = h
-$$
-$$
-t' = t + i = t + s \cdot (y_s - 1)
-$$
+$$s' = s + i = s \cdot y_s$$
+
+$$h' = h$$
+
+$$t' = t + i = t + s \cdot (y_s - 1)$$
 
 Now, let's introduce the normalized quantities $s_n$ and $h_n$. They simply represent the proportion of total circulating supply that each subset represents:
 
-$$
-s_n \equiv \frac{s}{t} 
-$$
-$$
-h_n \equiv \frac{h}{t}
-$$
+$$s_n \equiv \frac{s}{t}$$
+
+$$h_n \equiv \frac{h}{t}$$
 
 We can do the same for $s'_n$ and $h'_n$:
 
-$$
-s'_n \equiv \frac{s'}{t'} = \frac{sy_s}{s(y_s - 1) +t}
-$$
-$$
-h'_n \equiv \frac{h'}{t'} = \frac{t-s}{s(y_s - 1) + t}
-$$
+$$s'_n \equiv \frac{s'}{t'} = \frac{sy_s}{s(y_s - 1) +t}$$
+
+$$h'_n \equiv \frac{h'}{t'} = \frac{t-s}{s(y_s - 1) + t}$$
 
 With these definitions we can now introduce the effective yield as the change in the proportion of the total circulating supply observed by each subset.
 
-$$
-y_s^{eff} \equiv \frac{s'_n}{s_n} = \frac{y_s}{\frac{s}{t}(y_s-1) + 1}
-$$
-$$
-y_h^{eff} \equiv \frac{h'_n}{h_n} = \frac{1}{\frac{s}{t}(y_s-1) + 1}
-$$
+$$y_s^{eff} \equiv \frac{s'_n}{s_n} = \frac{y_s}{\frac{s}{t}(y_s-1) + 1}$$
+
+$$y_h^{eff} \equiv \frac{h'_n}{h_n} = \frac{1}{\frac{s}{t}(y_s-1) + 1} $$
 
 ![Effective Yield](plots/effective_yield.png)
 
@@ -80,9 +67,7 @@ With our definitions, after staking for a reference period stakers would have ea
 
 But if we introduce costs that eat away from the nominal yield (let's call them $k$), and costs that eat away from the principal (let's call them $c$). We arrive to the following formula for the net stake:
 
-$$
-s' = s(1-c) + s(y_s - 1) - \max(0, sk(y_s - 1))
-$$
+$$s' = s(1-c) + s(y_s - 1) - \max(0, sk(y_s - 1))$$
 
 NOTE: The max simply prevents that a cost that scales with yield becomes a profit if yield goes negative. For instance, if yield goes negative it's unlikely that an LST will pay the LST holders 10%. Or if yield goes negative you may not be able to recoup in taxes as if it were negative income. In those cases we set it to 0. This will become useful later on when we explore issuance curves with negative issuance regimes.
 
@@ -94,9 +79,7 @@ A home staker will have to pay for a PC that they amortize over 5 years and cost
 
 Now for the costs that scale with the yield. They will have to pay taxes, these are highly dependent on their tax jurisdiction, but may vary between 20% and 50% in most developed countries. Let's pick 35% as an intermediate value. In that case, their stake after costs looks like:
 
-$$
-s' = s\left(1-\frac{1}{1000}\right) + s(1-0.35)(y_s - 1)
-$$
+$$s' = s\left(1-\frac{1}{1000}\right) + s(1-0.35)(y_s - 1)$$
 
 We can do the same exercise for a staker using an LST. In this case, $c=0$ and $k$ is composed of staking fees (10-15%) and taxes (20-50%) which depend on the tax treatment. Rebasing tokens have the advantage of postponing the realization of capital gains. If we assume a 5 year holding period, equivalent to the amortization time we assumed for solo staking, it could look something like this:
 
@@ -105,27 +88,20 @@ We can do the same exercise for a staker using an LST. In this case, $c=0$ and $
 - Capital gains tax: 20%
 - Holding period: 5 years
 
-$$
-s' = s(1-0) + s(1-0.14)(y_s - 1)
-$$
+$$s' = s(1-0) + s(1-0.14)(y_s - 1)$$
 
 
 Finally, for a large scale operator. They have higher fixed costs, they will have to pay for labor, etc... But also will run much higher amount of validators. In that case, c can get much smaller as it's a proportion of s. Perhaps 1 or 2 orders of magnitude smaller. And taxes will be typical of corporate tax rates (20-30%).
 
-$$
-s' = s\left(1-\frac{1}{10000}\right) + s(1-0.25)(y_s - 1)
-$$
+$$s' = s\left(1-\frac{1}{10000}\right) + s(1-0.25)(y_s - 1)$$
 
 ## Net Effective Yield (a.k.a Real Yield)
 
 Finally, we can blend the two concepts together to understand what's the real yield a staker or holder obtains net of all forms of costs and after supply changes dilution. I would suggest calling this _net effective yield_ as the _real yield_, because well, that's the yield you are _really_ getting.
 
-$$
-y_s^{real} = \frac{(1-c) + (y_s - 1) - \max(0,k(y_s - 1))}{\frac{s}{t}(y_s-1)+1}
-$$
-$$
-y_h^{real} = y_h^{eff} = \frac{1}{\frac{s}{t}(y_s-1) + 1}
-$$
+$$y_s^{real} = \frac{(1-c) + (y_s - 1) - \max(0,k(y_s - 1))}{\frac{s}{t}(y_s-1)+1}$$
+
+$$y_h^{real} = y_h^{eff} = \frac{1}{\frac{s}{t}(y_s-1) + 1}$$
 
 In the second equation we are simply stating the fact that there is no cost to holding, so the real yield (after costs) of holding is the same as the effective yield of holding.
 
@@ -135,15 +111,11 @@ Up to here all the equations presented are agnostic of Ethereum's specificities 
 
 To bring this analysis back to Ethereum-land it suffices to substitute $y_s$ by Ethereum's issuance yield as a function of the total amount staked $s$. And substitute $t$ by the total circulating supply of ETH.
 
-$$
-t \approx 120\cdot 10^6 \quad \text{ETH}
-$$
-$$
-i(s) = 2.6 \cdot 64 \cdot \sqrt{s} \quad \text{ETH}\cdot\text{year}^{-1}
-$$
-$$
-y_{s}(s) = 1 + \frac{2.6 \cdot 64}{\sqrt{s}} \quad \text{year}^{-1}
-$$
+$$t \approx 120\cdot 10^6 \quad \text{ETH}$$
+
+$$i(s) = 2.6 \cdot 64 \cdot \sqrt{s} \quad \text{ETH}\cdot\text{year}^{-1}$$
+
+$$y_{s}(s) = 1 + \frac{2.6 \cdot 64}{\sqrt{s}} \quad \text{year}^{-1}$$
 
 ![Ethereum's Issuance Curve](./plots/ethereum_issuance/ethereum_issuance_plot.png)
 
@@ -218,14 +190,10 @@ Uncorrelation incentives are being explored in other posts. We will simply leave
 
 The following is an example of how such a negative term can be introduced.
 
-$$
-i(s) = 2.6 \cdot 64 \cdot \sqrt{s} - 2.6 \cdot \frac{s \ln s}{2048} \quad \text{ETH} \cdot \text{year}^{-1}
-$$
+$$i(s) = 2.6 \cdot 64 \cdot \sqrt{s} - 2.6 \cdot \frac{s \ln s}{2048} \quad \text{ETH} \cdot \text{year}^{-1}$$
 
 
-$$
-y_{s}(s) = 1 + \frac{2.6 \cdot 64}{\sqrt{s}} - \frac{2.6 \ln s}{2048} \quad \text{year}^{-1}
-$$
+$$y_{s}(s) = 1 + \frac{2.6 \cdot 64}{\sqrt{s}} - \frac{2.6 \ln s}{2048} \quad \text{year}^{-1}$$
 
 ![Ethereum's Issuance with Stake Burn](./plots/ethereum_issuance_with_stake_burn/ethereum_issuance_with_burn_plot.png)
 
@@ -243,14 +211,10 @@ We can see how the introduction of a negative issuance yield regime has helped a
 
 Given that we haven't touched the positive issuance term, this results in a large reduction of the staking yield. We can increase the yield trivially while respecting the same yield curve shape. Here the same curve with larger yield:
 
-$$
-i(s) = 2.6 \cdot 128 \cdot \sqrt{s} - 2.6 \cdot \frac{s \ln s}{1024} \quad \text{ETH} \cdot \text{year}^{-1}
-$$
+$$i(s) = 2.6 \cdot 128 \cdot \sqrt{s} - 2.6 \cdot \frac{s \ln s}{1024} \quad \text{ETH} \cdot \text{year}^{-1}$$
 
 
-$$
-y_{s}(s) = 1 + \frac{2.6 \cdot 128}{\sqrt{s}} - \frac{2.6 \ln s}{1024} \quad \text{year}^{-1}
-$$
+$$y_{s}(s) = 1 + \frac{2.6 \cdot 128}{\sqrt{s}} - \frac{2.6 \ln s}{1024} \quad \text{year}^{-1}$$
 
 ![Ethereum's Issuance with Stake Burn](./plots/ethereum_issuance_with_stake_burn/ethereum_issuance_with_burn_plot_2.png)
 

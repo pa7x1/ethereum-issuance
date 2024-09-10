@@ -13,7 +13,7 @@ Armed with these definitions we will be able to make some observations about how
 
 Then, we will propose a number of properties we would expect the issuance curve to satisfy to minimize these centralization forces. And explore some alternative issuance curves that could deal with the aforementioned issues.
 
-Finally, some closing thoughts on Minimal Viable Issuance and we will propose a way to think about it quantitatively.
+Finally, some heuristic arguments on how to fix a specific choice of issuance and yield curves.
 
 ## Effective Yield
 

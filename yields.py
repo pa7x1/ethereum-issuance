@@ -22,7 +22,7 @@ def real_issuance_yield(issuance_yield: float,
                         staked: Union[float, npt.NDArray[np.float64]],
                         fixed_costs: float,
                         scaling_costs: float,
-                        anticorrelation_incentives: float = 1.0) -> Union[float, npt.NDArray[np.float64]]:
+                        anticorrelation_incentives: float = 0.0) -> Union[float, npt.NDArray[np.float64]]:
     """
     The issuance yield observed by stakers net of costs and circulating supply changes.
     :param issuance_yield: The nominal issuance yield.

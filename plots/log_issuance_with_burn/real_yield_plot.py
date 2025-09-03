@@ -9,7 +9,7 @@ from common import CIRCULATING_SUPPLY, percentage_yield
 from cost_structure import home_staking, lst_staking, institutional_staking
 from plots.formatters import issuance_formatter, stake_formatter
 
-x = np.linspace(3200, CIRCULATING_SUPPLY, 240)
+x = np.linspace(3200, CIRCULATING_SUPPLY - 1_000_000, 240)
 
 
 real_staking_yield_solo = percentage_yield(real_issuance_yield(issuance_yield=log_issuance_with_burn_yield(x),

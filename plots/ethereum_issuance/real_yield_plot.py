@@ -6,6 +6,7 @@ import numpy as np
 from yield_curves import ethereum_issuance_yield
 from yields import real_issuance_yield, effective_holding_yield
 from common import CIRCULATING_SUPPLY, percentage_yield
+from cost_structure import home_staking, lst_staking, institutional_staking
 from plots.formatters import issuance_formatter, stake_formatter
 
 x = np.linspace(3200, CIRCULATING_SUPPLY, 240)
@@ -14,19 +15,17 @@ x = np.linspace(3200, CIRCULATING_SUPPLY, 240)
 real_staking_yield_solo = percentage_yield(real_issuance_yield(issuance_yield=ethereum_issuance_yield(x),
                                                                supply=CIRCULATING_SUPPLY,
                                                                staked=x,
-                                                               fixed_costs=1 / 1000,
-                                                               scaling_costs=0.35))
+                                                               **home_staking))
 real_staking_yield_lst = percentage_yield(real_issuance_yield(issuance_yield=ethereum_issuance_yield(x),
                                                               supply=CIRCULATING_SUPPLY,
                                                               staked=x,
-                                                              fixed_costs=0.,
-                                                              scaling_costs=0.14))
+                                                              **lst_staking))
 real_staking_yield_institutional = percentage_yield(
     real_issuance_yield(issuance_yield=ethereum_issuance_yield(x),
                         supply=CIRCULATING_SUPPLY,
                         staked=x,
-                        fixed_costs=1 / 10000,
-                        scaling_costs=0.25))
+                        **institutional_staking))
+
 real_holding_yield = percentage_yield(
     effective_holding_yield(issuance_yield=ethereum_issuance_yield(x), supply=CIRCULATING_SUPPLY, staked=x))
 

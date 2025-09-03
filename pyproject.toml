@@ -1,0 +1,10 @@
+[project]
+name = "ethereum-issuance"
+version = "0.1.0"
+description = "Analysis and plots for 'The Shape of Issuance Curves to Come'"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.10.6",
+    "numpy>=2.3.2",
+]

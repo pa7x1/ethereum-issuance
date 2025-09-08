@@ -38,7 +38,7 @@ plt.plot(x, real_staking_yield_institutional, label="Real Issuance Yield Institu
 plt.plot(x, real_holding_yield, label="Real Holding Yield", color="red", linewidth=1)
 
 # Add titles and labels
-plt.title("Ethereum with Stake Burn Real Issuance Yield")
+plt.title("Log Issuance with Stake Burn Real Issuance Yield")
 
 plt.gca().xaxis.set_major_formatter(FuncFormatter(stake_formatter))
 plt.xlabel('Stake (Millions of ETH)')

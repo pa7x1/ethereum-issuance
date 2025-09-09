@@ -29,13 +29,15 @@ real_staking_yield_institutional = percentage_yield(
 real_holding_yield = percentage_yield(
     effective_holding_yield(issuance_yield=log_issuance_with_burn_yield(x), supply=CIRCULATING_SUPPLY, staked=x))
 
+yield_delta = real_staking_yield_lst - real_holding_yield
 
 fig = plt.figure(figsize=(10, 6))
 
-plt.plot(x, real_staking_yield_solo, label="Real Issuance Yield Home Validator", color="blue", linewidth=1)
-plt.plot(x, real_staking_yield_lst, label="Real Issuance Yield LST", color="green", linewidth=1)
-plt.plot(x, real_staking_yield_institutional, label="Real Issuance Yield Institutional", color="orange", linewidth=1)
+plt.plot(x, real_staking_yield_solo, label="Real Yield Home Validator", color="blue", linewidth=1)
+plt.plot(x, real_staking_yield_lst, label="Real Yield LST", color="green", linewidth=1)
+plt.plot(x, real_staking_yield_institutional, label="Real Yield Institutional", color="orange", linewidth=1)
 plt.plot(x, real_holding_yield, label="Real Holding Yield", color="red", linewidth=1)
+plt.plot(x, yield_delta, label="(LST - Holding) Real Yield Delta", color="purple", linewidth=1, linestyle="--")
 
 # Add titles and labels
 plt.title("Log Issuance with Stake Burn Real Issuance Yield")

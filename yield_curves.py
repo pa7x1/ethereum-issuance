@@ -63,3 +63,11 @@ def vitaliks_issuance_yield(staked: Union[float, npt.NDArray[np.float64]]) -> Un
     :return: The annualized nominal yield.
     """
     return 1. + 2.6 * 64 * ((staked ** -0.5) - 0.5 * (2 ** 25 - staked) ** -0.5)
+
+def quadratic_burn(staked: Union[float, npt.NDArray[np.float64]]) -> Union[float, npt.NDArray[np.float64]]:
+    """
+    A proposal for Ethereum's issuance yield curve with quadratic stake burn
+    :param staked: Amount of ETH staked.
+    :return: The annualized nominal yield.
+    """
+    return 1. + 227.85 * staked ** -0.5 - 1.29e-17 * staked ** 2.

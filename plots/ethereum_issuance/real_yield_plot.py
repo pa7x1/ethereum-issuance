@@ -3,6 +3,6 @@ from plots.real_yield_plot import plot
 from common import CIRCULATING_SUPPLY
 
 plot(ethereum_issuance_yield,
-     title="Ethereum Issuance",
+     title="Ethereum's Real Yield",
      circulating_supply=CIRCULATING_SUPPLY,
      filename="ethereum_real_yield_plot.png")

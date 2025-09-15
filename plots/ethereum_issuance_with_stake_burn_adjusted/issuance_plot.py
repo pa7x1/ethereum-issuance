@@ -26,7 +26,7 @@ print(f"{float(current_ethereum_yield)=}")
 
 fig = plt.figure(figsize=(10, 6))
 
-plt.plot(x, issuance_plot, color="blue", linewidth=1)
+plt.plot(x, issuance_plot, color="blue", linewidth=1, label=r"$i(s) = R \sqrt{s} - B s\log s$")
 
 # Add titles and labels
 plt.title("Ethereum's Issuance with Stake Burn Curve")
@@ -36,6 +36,7 @@ plt.gca().yaxis.set_major_formatter(FuncFormatter(issuance_formatter))
 
 plt.xlabel('Stake (Millions of ETH)')
 plt.ylabel('Issuance (%)')
+plt.legend()
 plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 plt.axhline(y=0, color='k', linewidth=0.5)
 plt.axvline(x=0, color='k', linewidth=0.5)

@@ -14,7 +14,7 @@ nominal_issuance_yield = percentage_yield(ethereum_issuance_with_burn_yield_adju
 
 fig = plt.figure(figsize=(10, 6))
 
-plt.plot(x, nominal_issuance_yield,  color="blue", linewidth=1)
+plt.plot(x, nominal_issuance_yield,  color="blue", linewidth=1, label=r"$i(s) = R \frac{1}{\sqrt{s}} - B \log s$")
 
 # Add titles and labels
 plt.title("Ethereum's Issuance with Stake Burn Nominal Yield")
@@ -22,6 +22,7 @@ plt.title("Ethereum's Issuance with Stake Burn Nominal Yield")
 plt.gca().xaxis.set_major_formatter(FuncFormatter(stake_formatter))
 plt.xlabel('Stake (Millions of ETH)')
 plt.ylabel('Yield (%)')
+plt.legend()
 plt.ylim(top=10, bottom=-3)
 plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 plt.axhline(y=0, color='k', linewidth=0.5)

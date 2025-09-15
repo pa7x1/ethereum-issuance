@@ -18,7 +18,7 @@ def ethereum_issuance_with_burn_yield(staked: Union[float, npt.NDArray[np.float6
     :param staked: Amount of ETH staked.
     :return: The annualized nominal yield.
     """
-    return 1. + (2.6 * 64 * (staked ** -0.5) - 2.6 * np.log(staked) / 2048.)
+    return 1. + (2.6 * 64 * (staked ** -0.5) - 2.6 * np.log(1. + staked) / 2048.)
 
 def ethereum_issuance_with_burn_2_yield(staked: Union[float, npt.NDArray[np.float64]]) -> Union[float, npt.NDArray[np.float64]]:
     """
@@ -26,7 +26,7 @@ def ethereum_issuance_with_burn_2_yield(staked: Union[float, npt.NDArray[np.floa
     :param staked: Amount of ETH staked.
     :return: The annualized nominal yield.
     """
-    return 1. + 2. * (2.6 * 64 * (staked ** -0.5) - 2.6 * np.log(staked) / 2048.)
+    return 1. + 2. * (2.6 * 64 * (staked ** -0.5) - 2.6 * np.log(1. + staked) / 2048.)
 
 def ethereum_issuance_with_burn_yield_adjusted(staked: Union[float, npt.NDArray[np.float64]]) -> Union[float, npt.NDArray[np.float64]]:
     """
@@ -35,7 +35,7 @@ def ethereum_issuance_with_burn_yield_adjusted(staked: Union[float, npt.NDArray[
     :param staked: Amount of ETH staked.
     :return: The annualized nominal yield.
     """
-    return 1. + 3.5 * (2.6 * 64 * (staked ** -0.5) - 2.6 * np.log(staked) / 2048.)
+    return 1. + 3.5 * (2.6 * 64 * (staked ** -0.5) - 2.6 * np.log(1. + staked) / 2048.)
 
 def tempered_issuance(staked: Union[float, npt.NDArray[np.float64]], k: int = 2**25) -> Union[float, npt.NDArray[np.float64]]:
     """

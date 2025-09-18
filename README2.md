@@ -29,8 +29,8 @@ are full, they have managed to maintain a reasonably good peg to their NAV.
 - Client diversity: Healthier client diversity has mitigated the risks of a single client bug resulting in large correlation penalties.
 - Delta neutral strategies: Strategies that offer the yield of staking while hedging exposure with a short position on ETH
 remove the risk of ETH price volatility while extracting the yield.
-- Regulatory clarity: Completely external factors to the protocol like regulatory clarity, approval of staking ETFs,
-can have a significant impact in reducing the risk premium of staking.
+- Regulatory clarity: Completely external factors to the protocol like clear tax guidelines, regulatory clarity, 
+staking ETFs, custodial services by financial institutions, etc... can significantly reduce the risk premium of staking.
 
 Overall, as the Ethereum network matures and the risks associated with staking are reduced, the risk premium demanded by market 
 participants may continue to decrease.
@@ -58,10 +58,10 @@ this clearly if we flip the axis and treat the yield as the independent variable
 
 ![Risk Premium vs Stake Rate](plots/figures/inverse_function.png)
 
-This function is not defined for small risk premiums. The yield curve fails to match any stake rate when the risk
-premium gets low enough, roughly below 1.5%, which would cause runaway stake rates. If this were to happens, 
+The yield curve fails to match any stake rate when the risk premium gets low enough, roughly below 1.5%, 
+which would cause runaway stake rates. If this were to happen, 
 every staker would observe negative real yields, staking would become a cost for everyone.
-Staking may be a losing proposition, but the holding yield is even worse which 
+Staking may be a losing proposition, but the holding yield becomes even worse which 
 pushes ETH holders to convert to LST holders in the hopes of preventing further dilution. The end result of this regime
 is bad for everyone; bad for stakers, bad for ETH holders, and bad for the decentralization of the network (as argued in the
 previous post).
@@ -69,7 +69,7 @@ previous post).
 #### Formal Definition
 
 We will denote the yield demanded by the market from staking as $y_s$ (yield of staking). The yield of staking ETH has two components, 
-the issuance yield which is controlled by the protocol, $y_i$. And the exogenous yield, $y_e$ that results from all the economic activity 
+the issuance yield which is controlled by the protocol, $y_i$. And the exogenous yield, $y_e$, that results from all the economic activity 
 built on top of the protocol and that provides a return to stakers (e.g., tips, MEV, restaking...).
 
 Therefore, $y_s = y_i + y_e$.
@@ -80,19 +80,20 @@ can get arbitrarily close to 0. $y_s \in [0, \infty)$.
 **Assumption**: The exogenous yield may provide an additional, out of protocol, source of yield to stakers. Unless the
 exogenous yield can be assumed to be capped, we assume $y_e \in [0, \infty)$.
 
-As a consequence of these two general assumptions; the domain of the issuance yield must be $y_i \in (-\infty, \infty)$
+As a consequence of these two general assumptions; the issuance yield must be defined in the range $y_i \in (-\infty, \infty)$
 so that for any risk premium, $y_s \in [0, \infty)$, and any exogenous yield, $y_e \in [0, \infty)$, the issuance curve 
 can match the risk premium demanded by the market with a stake rate.
 
 The inverse of the issuance yield curve $y_i^{-1}$ must be a continuous invertible function that maps the 
 issuance yield set by the market ($y_i = y_s - y_e$) to a stake rate in the interval $(0, 1)$. 
-That is, $y_i^{-1}: \mathbb{R} \to (0, 1)$.
+That is, $y_i^{-1}: \mathbb{R} \to (0, 1)$ is a homeomorphism.
 
 We impose continuity such that small changes in the risk premium do not cause abrupt changes in the stake rate at which
 this yield is met. That the function is invertible is necessary because its inverse is the yield curve that the 
 protocol implements. In turn, the continuous and invertible conditions imply strict monotonicity. We can further constrain this monotonicity to
 strictly decreasing monotonicity by noting that the issuance yield must go up when the stake rate goes to 0 
-to ensure there is an economic incentive to attract stakers. The functions that satisfy these conditions are decreasing _sigmoid_ curves.
+to ensure there is an economic incentive to attract stakers. The functions that satisfy these conditions are decreasing 
+_sigmoid_-like curves.
 
 ![Decreasing Sigmoid Functions](plots/figures/decreasing_sigmoid_family_handdrawn.png)
 
@@ -103,6 +104,15 @@ interval $(0, 1)$ to the real line. Like shown in the following figure:
 
 As a direct application of the intermediate value theorem, there must be
 a value for which the yield curve crosses 0. That is, the issuance curve implements stake capping.
+
+Note that this result is quite general and it's based on quite reasonable assumptions: 
+- The yield curve is able to match a stake rate for any risk premium the market may demand.
+- Continuity of the yield curve.
+- Invertibility of the yield curve.
+- High yields at low stake rates. 
+
+If that's the case, then the yield curve has to be a homeomorphism from $(0,1)$ to the full range of risk premia. This 
+reduces the space of valid functions to sigmoid-like curves as depicted above.
 
 #### Why are Negative Issuance Yields Needed?
 
@@ -133,21 +143,22 @@ will be paid negative for meetings its duties? If that were the case, validators
 the cost associated with their duties, which would be very problematic.
 
 Fortunately, this does not need to be the case! The trick is to leave the rewards associated with those duties as a positive
-source of income for a validator and introduce a new negative term charged per epoch.
+source of income for a validator and introduce a new negative term charged per epoch that scales with the stake.
 
 Concretely, the issuance curve needs to have 2 components in this approach. The issuance reward, $i_r$, is a positive term, 
 and the issuance burn, $i_b$, implements the negative term:
 
 $i(s) = R i_r(s) -  B i_b(s)$
 
-By tweaking the analytic form of the 2 terms we can ensure that $i_b(s)$ overpowers $i_r(s)$ such that we can implement
-stake capping.
+By tweaking the analytic form of the 2 terms we can ensure that $i_b(s)$ overpowers $i_r(s)$ at a sufficiently high stake,
+effectively implementing stake capping.
 
 By tweaking the ratio between the pre-factors of each term we can set the stake cap wherever we may need it. And by applying
 a global factor to both we can set the desired yield at a particular stake rate. The following curve has been tweaked
 to have the following properties:
 
 - The reward term has the same analytic form as today, $i_r(s) \sim \sqrt{s}$.
+- The burn has a quadratic form, $i_b(s) \sim s^2$.
 - Stake Capping at 50M ETH, slightly before 50% stake rate.
 - Yield at 25% stake rate fixed at 3%. Same as today's current curve at 25 %.
 
@@ -155,44 +166,118 @@ to have the following properties:
 
 ### Healthy Stake Ranges
 
-We have seen how we have full freedom to decide where should the stake cap be set. In this section we will provide a couple of
-arguments that justify why the stake capping should be set before 50% stake rate. We will address this from two perspectives,
-the first one is the point of view of the protocol. The second one is the point of view of a validator and their economic
-self-interest.
+We have seen how we have full freedom to decide where should the stake cap be set. In this section we will provide a number of
+arguments that justify why the stake capping should be set before 50% stake rate. We will address this from different perspectives;
+the protocol point of view, the staker, and the holder. We will see that it is in the interest of all of them to keep
+stake rates under 50%.
 
 **Protocol**
 
-From the point of view of the protocol stake rates above 50% start to become problematic. Above these levels the majority 
+From the point of view of the protocol stake rates above 50% start to become problematic. Above these levels, the majority 
 of circulating supply is staking. In case of supermajority bug the majority of ETH holders could be incentivized to break
-the consensus rules. The negative yield regime can be seen as a protection mechanism from the protocol to prevent 
+the consensus rules. Stake capping and the negative yield regime can be seen as a protection mechanism from the protocol to prevent 
 this type of situations from happening. It sets an economic incentive to align the social layer with the protocol interests. 
 
-**Validator**
+**Staker**
 
-From the point of view of a validator, stake rates above 50% start to be self-dilutive and get validators closer to the
-point where they will observe negative real yields.
+From the point of view of a staker, stake rates above 50% start to be self-dilutive and get stakers progressively close 
+to the point where they will observe negative real yields.
 
-To make the case clear, let's focus on the two extremes; very low stake rates and very high stake rates.
+To make the case clear, let's focus on the two extremes; very low stake rates, and very high stake rates.
 
 At very low stake rates, the dilution effect of issuance is paid in full by holders which are the majority of the network.
 At the other extreme, at stake rates close to 100%, the issuance income is completely coming from self-dilution. At those
-levels staking yield is not real income, it's a redenomination of the unit of account. And when accounting for expenses
+levels staking yield is not real income, it's a redenomination of the unit of account. Which, when accounting for expenses
 and taxes, pushes validators to observe negative real yields. Very high stake rates are bad for validators from a purely
 economic perspective.
 
 The point at which the transition between these 2 extremes happens is exactly at 50%. At stake rates beyond that point
-most of the issuance income is self-dilution. Hence, the self-interest of a validator is to introduce stake capping before
-50%.
+most of the issuance income is self-dilution. Hence, the self-interest of a staker is to introduce stake capping before
+50% stake rate to ensure staking ETH is guaranteed to provide a positive real yield, however low the risk premium may be.
 
-### Target Yield
+**Holder**
 
-### Added Bonus
+For an ETH holder, very high stake rates also go against their self-interest because they cause greater dilution for holders.
 
-If we leave the reward term of the issuance curve untouched, the introduction of a negative term would diminish the 
-yield provided. But in the example above we have tweaked the yield to lock it at 25% with the same yield provided with
-today's issuance curve at 25%. This has an additional positive consequence; to achieve this result we must increase the
-term $R$ with respect to today's curve. This means that the rewards coming from attestations, which represent the majority
-of the regular steady income of a validator get increased with respect to the irregular sources of income (MEV, block proposals).
 
-This curve would increase the steady source of income for a validator by 40% at 25% stake rate. This is good because irregular sources
-of income tend to have centralizing effects.
+### Fixing the Curve Parameters
+
+The prefactors $R, B$ provide us two degrees of freedom with which we can set the stake cap,
+and a target yield at a specific stake rate. This means we have full freedom to set the issuance yield we want
+at some target stake. Introducing the negative term does not need to imply a reduction in
+the issuance yield at the target stake rate.
+
+
+In practice, healthy stake rates are found in a range. Too close to 50% stake
+rate is bad, but too close to 0% is also bad. A pragmatic middle point is 25%, which happens to be not
+too far off current stake rates (~30% circa Q4 2025).
+
+Ethereum's issuance curve today provides a 3% issuance yield when 25% of ETH is staked. We could introduce a 
+curve that maintains the same 3% issuance yield at 25% stake rate but implements stake capping.  Doing so would solve once and for
+all the threat of ever-growing stake rates, but without disrupting the existing validator base.
+
+The following figure illustrates how the curves can be introduced preserving the 3% yield at 30M ETH staked, while
+introducing stake capping before 60M ETH.
+
+![Comparison of Nominal Yields](plots/figures/nominal_yield_comparison.png)
+
+
+The yield curves shown above are defined as follows:
+
+```python
+import numpy as np
+
+def ethereum(staked: float) -> float:
+    """
+    Ethereum's current PoS issuance yield curve.
+    :param staked: Amount of ETH staked.
+    :return: The annualized nominal yield coming from issuance.
+    """
+    return 1. + 2.6 * 64 * staked ** -0.5
+
+def quadratic_burn(staked: float) -> float:
+    """
+    A proposal for Ethereum's issuance yield curve with quadratic stake burn.
+    :param staked: Amount of ETH staked.
+    :return: The annualized nominal yield.
+    """
+    return 1. + 227.85 * staked ** -0.5 - 1.29e-17 * staked ** 2.
+
+
+def log_burn(staked: float) -> float:
+    """
+    A proposal for Ethereum's issuance yield curve with log burn.
+    :param staked: Amount of ETH staked.
+    :return: The annualized nominal yield.
+    """
+    return 1. + 3.5 * (2.6 * 64 * (staked ** -0.5) - 2.6 * np.log(1. + staked) / 2048.)
+```
+
+The respective issuance curves are shown next, notice that stake capping also caps the issuance. For instance, the quadratic
+burn curve would cap the maximum issuance at 0.8% annual inflation at 25M ETH staked. At 35M ETH staked the inflation rate
+would be slightly below 0.7%, a minor reduction with respect to today's 0.8%. But increases in the stake rate would be met
+with a significant reduction in the inflation rate.
+
+![Comparison of Issuance Curves](plots/figures/issuance_curve_comparison.png)
+
+## Real Yields
+
+We started the discussion by introducing real yields and how the difference between the real yield of holding
+and staking defines a risk premium. We will now carefully review the real yields of the different curves to emphasize the
+negative externalities of yield curves that do not implement stake capping and illustrate how introducing stake capping solves them.
+
+### Ethereum's Issuance Real Yields
+
+![Ethereum's Real Yields Plot](plots/ethereum_issuance/ethereum_real_yield_plot.png)
+
+### Quadratic Burn Proposal Real Yields
+
+![Quadratic Burn Proposal Real Yields Plot](plots/quadratic_burn/ethereum_real_yield_with_burn_plot.png)
+
+### Log Burn Proposal Real Yields
+
+![Log Burn Proposal Real Yields Plot](plots/ethereum_issuance_with_stake_burn_adjusted/ethereum_real_yield_with_burn_plot.png)
+
+### Tempered Issuance Real Yields
+
+![Tempered Issuance Real Yields Plot](plots/tempered_issuance/tempered_issuance_real_yield_plot.png)

@@ -1,7 +1,7 @@
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter
+from matplotlib.ticker import FuncFormatter, MultipleLocator, AutoMinorLocator
 import numpy as np
 from yields import real_issuance_yield, effective_holding_yield
 from common import CIRCULATING_SUPPLY, percentage_yield
@@ -58,12 +58,22 @@ def plot(yield_curve: Callable,
     plt.title(title)
 
     plt.gca().xaxis.set_major_formatter(FuncFormatter(stake_formatter))
+
+    plt.gca().xaxis.set_major_locator(MultipleLocator(5_000_000))
+    plt.gca().yaxis.set_major_locator(MultipleLocator(1))
     plt.xlabel('Stake (Millions of ETH)')
     plt.ylabel('Yield (%)')
     plt.ylim(top=10, bottom=-3)
-    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    plt.xlim(left=0, right=120_000_000)
     plt.axhline(y=0, color='k', linewidth=0.5)
     plt.axvline(x=0, color='k', linewidth=0.5)
+
+    plt.gca().xaxis.set_minor_locator(AutoMinorLocator(5))
+    plt.gca().yaxis.set_minor_locator(AutoMinorLocator(5))
+    plt.gca().grid(True, which='major', linestyle='--', linewidth=.6, alpha=.7)
+    plt.gca().grid(True, which='minor', linestyle=':', linewidth=.4, alpha=.5)
+
+
     plt.legend(fontsize=12)
     plt.show()
     fig.savefig(f'./{filename}', dpi=fig.dpi)

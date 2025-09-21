@@ -153,6 +153,18 @@ $i(s) = R i_r(s) -  B i_b(s)$
 By tweaking the analytic form of the 2 terms we can ensure that $i_b(s)$ overpowers $i_r(s)$ at a sufficiently high stake,
 effectively implementing stake capping.
 
+> NOTE: Today (Pectra hard-fork), the consensus layer does not know the circulating supply of Ethereum, and therefore the issuance curve
+must be defined in terms of total amount of ETH staked, as shown in the equation above.
+>
+> In this form, stake capping targets a maximum amount of ETH staked, but cannot truly target a percentage of the
+> circulating supply of ETH staked. 
+> If we were to implement the necessary technical changes to provide the circulating supply to the consensus layer, 
+> we could implement proper stake rate capping. This approach would be preferred and provides for a more elegant design, 
+> that is resilient under circulating supply changes. A minimal tweak to the issuance curve formula proposed above 
+> to rely on the ratio between the amount of ETH staked vs. circulating supply would suffice.
+> 
+> The discussion on this note and the conclusions that derive from it are equally applicable.
+
 By tweaking the ratio between the pre-factors of each term we can set the stake cap wherever we may need it. And by applying
 a global factor to both we can set the desired yield at a particular stake rate. The following curve has been tweaked
 to have the following properties:
@@ -262,22 +274,77 @@ with a significant reduction in the inflation rate.
 
 ## Real Yields
 
-We started the discussion by introducing real yields and how the difference between the real yield of holding
-and staking defines a risk premium. We will now carefully review the real yields of the different curves to emphasize the
+An in-depth review of the concept of real yield and how it's calculated is provided in [https://ethresear.ch/t/the-shape-of-issuance-curves-to-come/20405](https://ethresear.ch/t/the-shape-of-issuance-curves-to-come/20405).
+
+The TL;DR is very simple, by real yield we mean the yield after costs and net of dilution effects due to supply changes.
+If this number is negative it means that after expenses your income from staking is lower than the inflation rate of the network,
+so you are not even earning enough ETH to compensate for the supply increase.
+
+We will now carefully review the real yields of different curves to emphasize the
 negative externalities of yield curves that do not implement stake capping and illustrate how introducing stake capping solves them.
+
+> Disclaimer: The real yield of different stakers presented below should be seen as representative probes of the real yield
+observed by that type of staker, given their typical cost structure. But mileage may vary, your specific real yield could be different depending on your
+cost structure. You can review the assumptions or tweak them to fit your circumstances here: [cost_structure.py](./cost_structure.py)
 
 ### Ethereum's Issuance Real Yields
 
+The following plot presents the real yield curves of three different types of stakers, based on their typical cost structures.
+Together with the real yield of an ETH holder and the difference between the real yields of an LST and holding ETH, which
+measures the risk premium of staking ETH via an LST.
+
 ![Ethereum's Real Yields Plot](plots/ethereum_issuance/ethereum_real_yield_plot.png)
+
+**Observations:**
+
+- The yield difference of staking with an LST vs. holding never goes below ~1.5%. If the risk premium of staking ETH were drop
+below 1.5% we could face very high stake rates.
+- At around 80M ETH staked, the real yield of solo staking goes negative.
+- At around 110M ETH staked, the real yield of staking with an LST goes negative. At which point every staker receives
+negative real yield, and so do holders. Where is the money going? HW vendors, ISPs, and taxes, primarily.
+- The large gap between solo stakers and LSTs receiving negative real yields creates
+a regime where solo stakers are pushed out of the validator set but LSTs can still be viable. Resulting in a centralization
+threat to the network.
 
 ### Quadratic Burn Proposal Real Yields
 
 ![Quadratic Burn Proposal Real Yields Plot](plots/quadratic_burn/ethereum_real_yield_with_burn_plot.png)
 
+**Observations:**
+
+- This issuance curve implements stake capping. At 50M ETH staked, the issuance yield goes to 0%. And beyond that it turns
+negative. Being able to compensate for large amounts of exogenous yield.
+- The ranges at which all types of stakers go to negative real yields have compressed significantly and happen very close
+to the stake cap.
+  - Avoids a large regime where solo stakers are pushed out of the validator set.
+  - It also means that staking can provide positive real yield for every staker even if the risk premium were to drop as low as 0.5%.
+
 ### Log Burn Proposal Real Yields
 
 ![Log Burn Proposal Real Yields Plot](plots/ethereum_issuance_with_stake_burn_adjusted/ethereum_real_yield_with_burn_plot.png)
 
+**Observations:**
+
+- This issuance curve implements stake capping. At ~55M ETH staked, the issuance yield goes to 0%. And beyond that it turns
+negative.
+- The slope towards negative yields is gentler than the example with quadratic burn. This results in the following:
+  - Less exogenous yield could be burnt, up to 3%. Exogenous yields above that could cause runaway stake rates.
+  - The gentler slope means that the range at which solo stakers observe negative real yields vs. LSTs widens with respect
+  to the quadratic burn. But it's significantly tighter than with no capping.
+
+
 ### Tempered Issuance Real Yields
 
 ![Tempered Issuance Real Yields Plot](plots/tempered_issuance/tempered_issuance_real_yield_plot.png)
+
+- Tempered issuance does not implement stake capping. Having a minimum risk premium of around ~0.5%. Arguably quite low
+but not 0%. If the risk premium of staking were to drop below that point it could face very high stake rates.
+- At around ~60M ETH, solo staking observes negative real yields which could cause solo stakers to get pushed out of the 
+validator set.
+- While LSTs remain viable until extremely high stake rates.
+- Two effects are at play that caused an increase of the gap between solo staking crossing 0% real yield and LSTs.
+  - Tempered issuance has a very gentle slope of the real yield at high stake rates. Gentler slopes tend to widen the gap. For contrast, check
+  the quadratic stake burn curve. An aggressive slope down causes all types of stakers to get pushed down at the same time.
+  - Tempered issuance, with the default parameters, provides very low nominal yield. Low nominal yields tend to kick out
+  solo stakers first, because the cost structure of solo stakers has a higher component of fixed costs. If the yield is
+  small enough fixed costs will eat it away.

@@ -1,4 +1,24 @@
-# The Shape of Issuance Curves To Come: Part 2
+# The Shape of Issuance Curves to Come: Part 2
+
+## Introduction
+
+In this note we show that, under broad assumptions, we can constrain the space of issuance functions to a class that is 
+well-behaved, free of pathological regimes that could produce runaway growth in the stake rate. 
+These curves implement stake capping, in the sense that the issuance yield is zero at a target stake.
+
+We then review a pragmatic way to introduce stake capping on Ethereum that is technically simple while keeping validators
+honest and fulfilling their duties.
+
+Finally, we evaluate different curves. Some with stake capping and some without. To illustrate the effect that
+stake capping has on the real yield observed by different types of stakers. 
+The conclusion is perhaps counterintuitive: stake capping benefits stakers, holders, and the protocol. 
+The key is to look at the real yield that a staker receives, taking into account expenses and dilution. 
+Stake capping ensures that all types of stakers can obtain positive real yields, reduces issuance which prevents a 
+strong dilution effect on holders, and ensures the protocol does not overpay for security.
+
+This document is accompanied by a repository with all the code and plots. Feel free to review it and test your own issuance curves.
+
+Source: https://github.com/pa7x1/ethereum-issuance
 
 ## Staking Risk Premium and the Issuance Curve
 

@@ -22,12 +22,12 @@ Source: https://github.com/pa7x1/ethereum-issuance
 
 ## Staking Risk Premium and the Issuance Curve
 
-The yield provided by staking Ethereum is market-driven, market participants expect to receive a premium for staking ETH vs. holding
+The yield provided by staking on Ethereum is market-driven, market participants expect to receive a premium for staking ETH vs. holding
 ETH that compensates for the additional risks on which they partake. These risks are varied:
 
-- Operational risks: Keeping the ETH or LST secure, smart contract risks, slashing risks...
+- Operational risks: Custody, smart contract risks, and slashing risks.
 - Liquidity risks: Staking ETH locks it in the staking contract, which makes it less liquid. LSTs alleviate some of that
-illiquidity but may be subject to de-pegs, particularly when the exit and entry queues to the staking contract are full.
+illiquidity but may be subject to depegs, particularly when the exit and entry queues to the staking contract are full.
 - Opportunity cost risks: Market opportunities you may not be able to take or would cause you to obtain worse yield if
 you are staking instead of holding ETH.
 
@@ -39,18 +39,18 @@ it's the _reservation yield of the marginal staker_.
 Many of these risks will tend to decrease as time goes on, and this means that the risk premium will progressively get smaller and smaller.
 To illustrate this, we will mention some ways in which the risks associated with staking have progressively gone down with time.
 
-- Lindy effect: The probability of finding a new vulnerability on an existing smart contract keeps reducing
+- Lindy effect: The probability of finding a new vulnerability in an existing smart contract decreases
 as its longevity increases. 
 - Account security: Improved wallet UX, improved operational practices, advances in account abstraction, etc. make staking ETH less risky.
-- Slashing protection: Slashing requires a very specific type of equivocation from the validator that can be entirely avoided with proper configuration
-and awareness from the operator on which practices to avoid. Furthermore, slashing penalties have been reduced and clients offer some protections like [doppelganger protection](https://lighthouse-book.sigmaprime.io/validator_doppelganger.html). 
+- Slashing protection: Slashing requires a very specific type of equivocation fthat can be entirely avoided with proper configuration
+and well-documented operational practices. Furthermore, slashing penalties have been reduced and clients offer some protections like [doppelganger protection](https://lighthouse-book.sigmaprime.io/validator_doppelganger.html). 
 - Liquidity: LSTs mitigate to a large degree the liquidity risks of staking, even in situations where the entry and exit queues to the staking contract
 are full, they have managed to maintain a reasonably good peg to their NAV. 
 - Client diversity: Healthier client diversity has mitigated the risks of a single client bug resulting in large correlation penalties.
 - Delta neutral strategies: Strategies that offer the yield of staking while hedging exposure with a short position on ETH
 remove the risk of ETH price volatility while extracting the yield.
-- Regulatory clarity: Completely external factors to the protocol like clear tax guidelines, regulatory clarity, 
-staking ETFs, custodial services by financial institutions, etc... can significantly reduce the risk premium of staking.
+- Regulatory clarity: External factors like tax guidance, regulatory developments, staking ETFs, 
+and institutional custody can significantly reduce the risk premium of staking.
 
 Overall, as the Ethereum network matures and the risks associated with staking are reduced, the risk premium demanded by market 
 participants may continue to decrease.
@@ -113,7 +113,7 @@ this yield is met. That the function is invertible is necessary because its inve
 protocol implements. In turn, the continuous and invertible conditions imply strict monotonicity. We can further constrain this monotonicity to
 strictly decreasing monotonicity by noting that the issuance yield must go up when the stake rate goes to 0 
 to ensure there is an economic incentive to attract stakers. The functions that satisfy these conditions are decreasing 
-_sigmoid_-like curves.
+_sigmoid_ curves.
 
 ![Decreasing Sigmoid Functions](plots/figures/decreasing_sigmoid_family_handdrawn.png)
 
@@ -159,7 +159,7 @@ Ethereum's issuance fulfills a critical role in setting the economic incentives 
 validator gets paid through issuance for [attestations, sync committees, and block proposals](https://eth2book.info/capella/part2/incentives/rewards/).
 
 If the rewards come from issuance and the issuance curve goes to 0 or even negative, does this mean that a validator
-will be paid negative for meetings its duties? If that were the case, validators may start gaming the network to avoid
+will be paid negative amounts for meetings its duties? If that were the case, validators may start gaming the network to avoid
 the cost associated with their duties, which would be very problematic.
 
 Fortunately, this does not need to be the case! The trick is to leave the rewards associated with those duties as a positive
@@ -319,7 +319,9 @@ measures the risk premium of staking ETH via an LST.
 
 - The yield difference of staking with an LST vs. holding never goes below ~1.5%. If the risk premium of staking ETH were drop
 below 1.5% we could face very high stake rates.
-- At around 80M ETH staked, the real yield of solo staking goes negative.
+- At around 80M ETH staked, the real yield of solo staking goes negative. At that point solo stakers will tend to be 
+pushed out of the validator set. Either because they turn-off their machines and convert into other type of staker that
+can still thrive or simply through the slow process of dilution.
 - At around 110M ETH staked, the real yield of staking with an LST goes negative. At which point every staker receives
 negative real yield, and so do holders. Where is the money going? HW vendors, ISPs, and taxes, primarily.
 - The large gap between solo stakers and LSTs receiving negative real yields creates
@@ -336,7 +338,7 @@ threat to the network.
 negative. Being able to compensate for large amounts of exogenous yield.
 - The ranges at which all types of stakers go to negative real yields have compressed significantly and happen very close
 to the stake cap.
-  - Avoids a large regime where solo stakers are pushed out of the validator set.
+  - Avoids a large regime where solo stakers are pushed out of the validator set, while LSTs can thrive.
   - It also means that staking can provide positive real yield for every staker even if the risk premium were to drop as low as 0.5%.
 
 ### Log Burn Proposal Real Yields
@@ -357,14 +359,16 @@ negative.
 
 ![Tempered Issuance Real Yields Plot](plots/tempered_issuance/tempered_issuance_real_yield_plot.png)
 
-- Tempered issuance does not implement stake capping. Having a minimum risk premium of around ~0.5%. Arguably quite low
+- Tempered issuance does not implement stake capping. Being able to match a minimum risk premium of around ~0.5%. Arguably quite low,
 but not 0%. If the risk premium of staking were to drop below that point it could face very high stake rates.
 - At around ~60M ETH, solo staking observes negative real yields which could cause solo stakers to get pushed out of the 
 validator set.
 - While LSTs remain viable until extremely high stake rates.
 - Two effects are at play that caused an increase of the gap between solo staking crossing 0% real yield and LSTs.
   - Tempered issuance has a very gentle slope of the real yield at high stake rates. Gentler slopes tend to widen the gap. For contrast, check
-  the quadratic stake burn curve. An aggressive slope down causes all types of stakers to get pushed down at the same time.
-  - Tempered issuance, with the default parameters, provides very low nominal yield. Low nominal yields tend to kick out
-  solo stakers first, because the cost structure of solo stakers has a higher component of fixed costs. If the yield is
-  small enough fixed costs will eat it away.
+  the quadratic stake burn curve, an aggressive slope down causes all types of stakers to get pushed down at the same time.
+  - Tempered issuance, with the default parameters, has very low issuance which results in a significant reduction
+  of nominal yield. Low nominal yields tend to kick out solo stakers earlier, because the cost structure of solo stakers 
+  has a higher component of fixed costs. If the yield is small enough fixed costs will eat it away. While with very
+  low issuance, LSTs remain economically viable until very high stake rates. Their cost structure is not affected by fixed
+  costs and with low issuance the dilution effect that drives real yields down at high stake rates is reduced

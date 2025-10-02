@@ -18,7 +18,7 @@ plt.plot(x, eff_holding_yield, label="Effective Holding Yield", color="red", lin
 
 
 # Add titles and labels
-plt.title("Effective Yield vs Stake Rate (y_s = 1.05)")
+plt.title("Effective Yield vs Stake Ratio (y_s = 1.05)")
 def custom_formatter(x, pos):
     return f'{x/1_000_000.:.0f}'
 

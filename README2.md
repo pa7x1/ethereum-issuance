@@ -3,7 +3,7 @@
 ## Introduction
 
 In this note we show that, under broad assumptions, we can constrain the space of issuance functions to a class that is 
-well-behaved, free of pathological regimes that could produce runaway growth in the stake rate. 
+well-behaved, free of pathological regimes that could produce runaway growth in the stake ratio. 
 These curves implement stake capping, in the sense that the issuance yield is zero at a target stake.
 
 We then review a pragmatic way to introduce stake capping on Ethereum that is technically simple while keeping validators

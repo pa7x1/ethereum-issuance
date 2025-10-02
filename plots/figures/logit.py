@@ -16,7 +16,7 @@ param_sets = [
     (0.0, 2.0),
 ]
 
-x = np.linspace(-10, 10, 800)
+x = np.linspace(-20, 20, 2000)
 
 plt.figure(figsize=(9, 6))
 for (x0, k) in param_sets:
@@ -24,7 +24,8 @@ for (x0, k) in param_sets:
     plt.plot(y, x, linewidth=2.0, )
 
 plt.xlim(0, 1)
-plt.xlabel(r"Stake Rate")
+plt.ylim(-10, 10)
+plt.xlabel(r"Stake Ratio")
 plt.ylabel(r"$y_i$")
 plt.title(r"Family of Issuance Yield Curves")
 plt.grid(True, linestyle="--", alpha=0.4)

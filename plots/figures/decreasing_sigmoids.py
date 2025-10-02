@@ -16,7 +16,7 @@ param_sets = [
     (0.0, 2.0),
 ]
 
-x = np.linspace(-10, 10, 800)
+x = np.linspace(-20, 20, 2000)
 
 plt.figure(figsize=(9, 6))
 for (x0, k) in param_sets:
@@ -24,8 +24,9 @@ for (x0, k) in param_sets:
     plt.plot(x, y, linewidth=2.0, )
 
 plt.ylim(-0.05, 1.05)
+plt.xlim(-10, 10)
 plt.xlabel(r"$y_i$")
-plt.ylabel(r"Stake Rate")
+plt.ylabel(r"Stake Ratio")
 plt.title(r"Family of Decreasing $\mathit{Sigmoid}$ Curves")
 plt.grid(True, linestyle="--", alpha=0.4)
 plt.tight_layout()

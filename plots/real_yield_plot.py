@@ -52,7 +52,7 @@ def plot(yield_curve: Callable,
     plt.plot(x, real_staking_yield_lst, label="Issuance Real Yield LST", color="green", linewidth=1)
     plt.plot(x, real_staking_yield_institutional, label="Issuance Real Yield Institutional", color="orange", linewidth=1)
     plt.plot(x, real_holding_yield, label="Issuance Real Holding Yield", color="red", linewidth=1)
-    plt.plot(x, yield_delta, label="(LST - Holding) Issuance Real Yield Delta", color="purple", linewidth=1, linestyle="--")
+    plt.plot(x, yield_delta, label="(LST - Holding) Risk Premium", color="purple", linewidth=1, linestyle="--")
 
     # Add titles and labels
     plt.title(title)

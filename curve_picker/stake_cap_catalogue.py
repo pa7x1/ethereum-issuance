@@ -21,7 +21,6 @@ curves = [
     ethereum_issuance_with_aggressive_log_burn_yield,
     quadratic_burn,
     linear_burn,
-    croissant_baguette,
 ]
 
 
@@ -146,12 +145,14 @@ plots_root = Path(__file__).resolve().parent / "plots"
 plots_root.mkdir(parents=True, exist_ok=True)
 
 stake_cap_catalogue = {}
+curve_functions = []
 
 for curve in curves:
     params = fix_parameters(curve)
     stake_cap_catalogue[curve.__name__] = params
 
     curve_fn = partial(curve, params["k"], params["b"])
+    curve_functions.append((_title_for(curve), curve_fn))
 
     curve_plot_dir = plots_root / curve.__name__
     curve_plot_dir.mkdir(parents=True, exist_ok=True)
@@ -160,3 +161,50 @@ for curve in curves:
     _plot_real_yield(curve_fn, title, curve_plot_dir / "real_yield_plot.png")
     _plot_nominal_yield(curve_fn, title, curve_plot_dir / "nominal_yield_plot.png")
     _plot_issuance_curve(curve_fn, title, curve_plot_dir / "issuance_curve_plot.png")
+    
+    
+combined_plot_dir = plots_root / "combined"
+combined_plot_dir.mkdir(parents=True, exist_ok=True)
+
+x = np.linspace(3200, CIRCULATING_SUPPLY, 240)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+
+for title, curve_fn in curve_functions:
+    nominal = percentage_yield(curve_fn(x))
+    ax.plot(x, nominal, linewidth=2, label=f"{title}")
+
+ax.set_title("Nominal Yield Comparison")
+ax.xaxis.set_major_formatter(FuncFormatter(stake_formatter))
+ax.set_xlabel("Stake (Millions of ETH)")
+ax.set_ylabel("Yield (%)")
+ax.set_ylim(bottom=-3, top=10)
+ax.set_xlim(left=0, right=CIRCULATING_SUPPLY)
+ax.grid(True, which="both", linestyle="--", linewidth=0.5)
+ax.axhline(y=0, color="k", linewidth=0.5)
+ax.axvline(x=0, color="k", linewidth=0.5)
+ax.legend(fontsize=12)
+
+fig.savefig(combined_plot_dir / "nominal_yield_comparison.png", dpi=fig.dpi)
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+
+for title, curve_fn in curve_functions:
+    issuance_ratio = issuance(curve_fn, x) / CIRCULATING_SUPPLY
+    ax.plot(x, issuance_ratio, linewidth=2, label=f"{title}")
+
+ax.set_title("Issuance Curve Comparison")
+ax.xaxis.set_major_formatter(FuncFormatter(stake_formatter))
+ax.yaxis.set_major_formatter(FuncFormatter(issuance_formatter))
+ax.set_xlabel("Stake (Millions of ETH)")
+ax.set_ylabel("Issuance (%)")
+ax.set_xlim(left=0, right=CIRCULATING_SUPPLY)
+ax.set_ylim(bottom=-0.03, top=0.02)
+ax.grid(True, which="both", linestyle="--", linewidth=0.5)
+ax.axhline(y=0, color="k", linewidth=0.5)
+ax.axvline(x=0, color="k", linewidth=0.5)
+ax.legend(fontsize=12)
+
+fig.savefig(combined_plot_dir / "issuance_curve_comparison.png", dpi=fig.dpi)
+plt.close(fig)

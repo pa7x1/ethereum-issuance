@@ -1,7 +1,6 @@
 import math
 from typing import Callable, Dict, Tuple
 from common import CIRCULATING_SUPPLY
-import curve_picker.candidates as c
 
 
 def fix_parameters(
@@ -18,7 +17,9 @@ def fix_parameters(
 
     def find_b() -> float:
         """Solve curve_minus_one(b, stake_cap_ratio) == 0 via bisection."""
-        f_low = curve_minus_one(0.0, stake_cap_ratio)
+        stake_cap_amount = stake_cap_ratio * CIRCULATING_SUPPLY
+
+        f_low = curve_minus_one(0.0, stake_cap_amount)
         if f_low <= 0.0:
             raise ValueError(
                 "Positive term of the curve must exceed the negative term when b = 0."
@@ -26,14 +27,14 @@ def fix_parameters(
 
         b_low = 0.0
         b_high = 1.0
-        f_high = curve_minus_one(b_high, stake_cap_ratio * CIRCULATING_SUPPLY)
+        f_high = curve_minus_one(b_high, stake_cap_amount)
 
         # Expand the upper bound until the root is bracketed.
-        max_iterations = 100
+        max_iterations = 1000
         expansion_count = 0
         while f_high > 0.0 and expansion_count < max_iterations:
             b_high *= 2.0
-            f_high = curve_minus_one(b_high, stake_cap_ratio * CIRCULATING_SUPPLY)
+            f_high = curve_minus_one(b_high, stake_cap_amount)
             expansion_count += 1
 
         if f_high > 0.0:
@@ -44,9 +45,7 @@ def fix_parameters(
         # Standard bisection loop.
         for _ in range(max_iterations):
             b_mid = 0.5 * (b_low + b_high)
-            f_mid = curve_minus_one(b_mid, stake_cap_ratio * CIRCULATING_SUPPLY)
-            if abs(f_mid) < 1e-9:
-                return b_mid
+            f_mid = curve_minus_one(b_mid, stake_cap_amount)
             if f_mid > 0.0:
                 b_low = b_mid
             else:

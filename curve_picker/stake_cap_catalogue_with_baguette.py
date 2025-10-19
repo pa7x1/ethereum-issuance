@@ -17,11 +17,11 @@ from issuance import issuance
 
 
 curves = [
-    log_burn,
-    aggressive_log_burn,
-    quadratic_burn,
-    linear_burn,
-    constant_burn,
+    log_burn_baguette,
+    aggressive_log_burn_baguette,
+    quadratic_burn_baguette,
+    linear_burn_baguette,
+    constant_burn_baguette,
 ]
 
 
@@ -186,7 +186,7 @@ ax.axhline(y=0, color="k", linewidth=0.5)
 ax.axvline(x=0, color="k", linewidth=0.5)
 ax.legend(fontsize=12)
 
-fig.savefig(combined_plot_dir / "nominal_yield_comparison.png", dpi=fig.dpi)
+fig.savefig(combined_plot_dir / "nominal_yield_comparison_baguette.png", dpi=fig.dpi)
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -207,5 +207,5 @@ ax.axhline(y=0, color="k", linewidth=0.5)
 ax.axvline(x=0, color="k", linewidth=0.5)
 ax.legend(fontsize=12)
 
-fig.savefig(combined_plot_dir / "issuance_curve_comparison.png", dpi=fig.dpi)
+fig.savefig(combined_plot_dir / "issuance_curve_comparison_baguette.png", dpi=fig.dpi)
 plt.close(fig)

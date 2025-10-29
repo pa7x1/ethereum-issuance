@@ -65,7 +65,7 @@ The tempered issuance curve brings the base reward towards 0 as the stake ratio 
 
 ![Tempered Issuance Real Yield Plot](../plots/tempered_issuance/tempered_issuance_real_yield_plot.png)
 
-The tempered issuance curve increases the gap between the real yields observed by solo-stakers and LST holders. This occurs because of 2 reasons. 
+The tempered issuance curve increases the gap between the real yields observed by solo-stakers and LST holders.
 
 
 ## Linear Burn

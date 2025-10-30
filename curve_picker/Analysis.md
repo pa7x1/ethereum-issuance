@@ -110,9 +110,9 @@ The tempered issuance curve presents a large gap between the real yields observe
 
 ## Linear Burn
 
-**Yield Function:** $y_i(s) = \underbrace{1.53 \cdot 2.6 \cdot 64 \cdot \frac{1}{\sqrt{s}}}_{\text{rewards}} - \underbrace{5.47 \cdot 10^{-10} \cdot s}_{\text{stake burn}}$
+**Yield Function:** $y_i(s) = 1.53 \cdot 2.6 \cdot 64 \cdot \frac{1}{\sqrt{s}} - 5.47 \cdot 10^{-10} \cdot s$
 
-**Issuance Function:** $i(s) = \underbrace{1.53 \cdot 2.6 \cdot 64 \cdot \sqrt{s}}_{\text{rewards}} - \underbrace{5.47 \cdot 10^{-10} \cdot s^{2}}_{\text{stake burn}}$
+**Issuance Function:** $i(s) = 1.53 \cdot 2.6 \cdot 64 \cdot \sqrt{s} - 5.47 \cdot 10^{-10} \cdot s^{2}$
 
 
 #### Plots
@@ -125,7 +125,7 @@ The tempered issuance curve presents a large gap between the real yields observe
 #### Risk Premia Coverage
 
 
-Issuance yield range: $y_i \in [\underbrace{-4.25\%}_{-y_e^{max}}, \infty)$. 
+Issuance yield range: $y_i \in [-4.25\%, \infty)$. 
 
 
 It can match any risk premium as long as the exogenous yield remains lower than 4.25%.
@@ -159,9 +159,9 @@ The gap between the real yields observed by different types of stakers is signif
 
 ## Quadratic Burn
 
-**Yield Function:** $y_i(s) = \underbrace{1.20 \cdot 2.6 \cdot 64 \cdot \frac{1}{\sqrt{s}}}_{\text{rewards}} - \underbrace{7.18 \cdot 10^{-18} \cdot s^2}_{\text{stake burn}}$
+**Yield Function:** $y_i(s) = 1.20 \cdot 2.6 \cdot 64 \cdot \frac{1}{\sqrt{s}} - 7.18 \cdot 10^{-18} \cdot s^2$
 
-**Issuance Function:** $i(s) = \underbrace{1.20 \cdot 2.6 \cdot 64 \sqrt{s}}_{\text{rewards}} - \underbrace{7.18 \cdot 10^{-18} \cdot s^{3}}_{\text{stake burn}}$
+**Issuance Function:** $i(s) = 1.20 \cdot 2.6 \cdot 64 \sqrt{s}}_{\text{rewards}} - 7.18 \cdot 10^{-18} \cdot s^{3}$
 
 #### Plots
 
@@ -174,7 +174,7 @@ The gap between the real yields observed by different types of stakers is signif
 #### Risk Premia Coverage
 
 
-Issuance yield range: $y_i \in [\underbrace{-8.5\%}_{-y_e^{max}}, \infty)$. 
+Issuance yield range: $y_i \in [-8.5\%, \infty)$. 
 
 
 It can match any risk premium as long as the exogenous yield remains lower than 8.5%.

@@ -2,6 +2,7 @@ from functools import partial
 from pathlib import Path
 import numpy as np
 import matplotlib
+from pprint import pprint
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -163,6 +164,9 @@ for curve in curves:
     _plot_nominal_yield(curve_fn, title, curve_plot_dir / "nominal_yield_plot.png")
     _plot_issuance_curve(curve_fn, title, curve_plot_dir / "issuance_curve_plot.png")
 
+
+print("Curve Parameters:")
+pprint(stake_cap_catalogue)
 
 combined_plot_dir = plots_root / "combined"
 combined_plot_dir.mkdir(parents=True, exist_ok=True)

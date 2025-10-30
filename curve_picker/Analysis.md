@@ -229,7 +229,7 @@ It can match any positive risk premium as long as there is no exogenous yield.
 
 #### 1-to-1 Map Between Yields and Stake ⚠️ 
 
-The bagguete variant curves do NOT satisfy this mathematical property that ensures the curve can do its job of assigning stake ratios univocally given the demanded risk premium.
+The baguette variant curves do NOT satisfy this mathematical property that ensures the curve can do its job of assigning stake ratios univocally given the demanded risk premium.
 
 The main point of concern is that if the risk premium were to fall to 0% or lower this type of curve is unable to match a single stake ratio. At that point small changes in the demand for yield could result in large changes in the amount of stake.
 

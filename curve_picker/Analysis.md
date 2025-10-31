@@ -161,7 +161,7 @@ The gap between the real yields observed by different types of stakers is signif
 
 **Yield Function:** $y_i(s) = 1.20 \cdot 2.6 \cdot 64 \cdot \frac{1}{\sqrt{s}} - 7.18 \cdot 10^{-18} \cdot s^2$
 
-**Issuance Function:** $i(s) = 1.20 \cdot 2.6 \cdot 64 \sqrt{s}}_{\text{rewards}} - 7.18 \cdot 10^{-18} \cdot s^{3}$
+**Issuance Function:** $i(s) = 1.20 \cdot 2.6 \cdot 64 \sqrt{s} - 7.18 \cdot 10^{-18} \cdot s^{3}$
 
 #### Plots
 
@@ -206,13 +206,13 @@ The quadratic burn proposal satisfies the micro-incentives criterion.
 
 The gap between the real yields observed by different types of stakers is significantly tighter, due to the implementation of stake capping. Solo stakers can perceive positive real yields up to ~53M ETH staked, while at 60M ETH all stakers start receiving negative real yields from issuance.
 
-**Yield Function:** $y_i(s) = 1.20 \cdot 2.6 \cdot 64 \cdot \frac{1}{\sqrt{s}} - \min(1.20 \cdot 2.6 \cdot 64 \cdot \frac{1}{\sqrt{s}}, 7.18 \cdot 10^{-18} \cdot s^2)$
-
-**Issuance Function:** $i(s) = 1.20 \cdot 2.6 \cdot 64 \sqrt{s} - \min(1.20 \cdot 2.6 \cdot 64 \sqrt{s}, 7.18 \cdot 10^{-18} \cdot s^{3})$
-
 ## Baguette Variants (Quadratic Burn Example)
 
 Baguette variant curves are defined by capping the negative term to never surpass the issuance. Such that the yield cannot go negative. They share many of the properties with their non-baguette counter-parts, for this reason we will analyze one of them. Which will highlight the main difference and single point of concern.
+
+**Yield Function:** $y_i(s) = 1.20 \cdot 2.6 \cdot 64 \cdot \frac{1}{\sqrt{s}} - \min(1.20 \cdot 2.6 \cdot 64 \cdot \frac{1}{\sqrt{s}}, 7.18 \cdot 10^{-18} \cdot s^2)$
+
+**Issuance Function:** $i(s) = 1.20 \cdot 2.6 \cdot 64 \sqrt{s} - \min(1.20 \cdot 2.6 \cdot 64 \sqrt{s}, 7.18 \cdot 10^{-18} \cdot s^{3})$
 
 #### Plots
 

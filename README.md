@@ -15,6 +15,43 @@ Then, we will propose a number of properties we would expect the issuance curve 
 
 Finally, some heuristic arguments on how to fix a specific choice of issuance and yield curves.
 
+## TL;DR
+
+The one-idea summary of this repo: **judge issuance curves by the *real yield* they leave each type of staker — yield
+net of dilution and net of costs — not by the nominal yield.** Through that lens:
+
+- **Under the current curve, solo stakers are pushed out long before anyone else.** Real yields cross 0% at different
+stake levels for different stakers because their cost structures differ (USD-fixed hardware/labor vs fees proportional
+to rewards). With costs priced bottom-up at today's ETH prices, a 32 ETH solo staker stops beating simply holding ETH
+at ~52M ETH staked, while delegated stakers stay viable to ~82–90M. Everything between those crossings is a regime
+that structurally centralizes the validator set.
+
+![Ethereum Real Yields, Refined Costs](refined_costs/plots/real_yields_current_curve.png)
+
+- **The current curve also has no off-switch**: its yield floor (~1.5% plus MEV) means that if the market's required
+staking premium keeps falling, nothing economic stops stake growth — only non-economic frictions do (lost, locked, and
+DeFi-deployed ETH; in practice somewhere below the ~two-thirds ceiling other PoS chains top out at), with everyone —
+stakers included — diluted along the way.
+The fix argued in this post and formalized in [Part 2](README2.md) is *stake capping*: a curve whose yield tapers to
+zero (and, to also charge MEV-type exogenous yield, negative) around a target stake ratio, paired with uncorrelation
+incentives.
+
+- **[EIP-8363](https://github.com/ethereum/EIPs/pull/12081), the live proposal, caps issuance at a 50% ratio but
+floors the yield at zero** — so its cap is soft by exactly the size of the MEV pie, and where stake actually stops
+depends on a risk premium nobody controls (49% of supply at a 0.25% required premium, 90% at 0.1%). At today's prices
+its permanent curve leaves solos — and CSM-style bonded home operators — real-negative barely above today's stake
+levels (a gap the current ~2.2M ETH activation queue closes by itself), while plain delegation never stops paying.
+It is nonetheless a large improvement on the status quo's ~1.5% yield floor; the remaining gaps are the MEV pie,
+tax treatment, and uncorrelation incentives:
+
+![EIP-8363 Real Yields, Refined Costs](refined_costs/plots/real_yields_eip8363.png)
+
+Where to read more: this post introduces effective/real yield and the desired curve properties;
+[README2.md](README2.md) derives stake capping formally and proposes how to implement it;
+[curve_picker/Analysis.md](curve_picker/Analysis.md) scores candidate curves;
+[REFINED_COSTS.md](REFINED_COSTS.md) holds the refined cost model, cohort analysis (delegators, CSM, Rocket Pool,
+node operators), equilibrium estimates, and cross-chain evidence behind the figures above.
+
 ## Effective Yield
 
 By effective yield we mean the yield observed by an Ethereum holder after taking into account circulating supply changes. For instance, if everyone were to be a staker, the yield observed would be _effectively_ 0%. As the new issuance is split evenly among all participants, the ownership of the circulating supply experienced by each staker would not change. Pre-taxes and other associated costs this situation resembles more a token re-denomination or a fractional stock split. So we would expect the effective yield to progressively reach 0% as stake rates grow to 100%.
@@ -267,3 +304,24 @@ The analytic form of the yield curve or the issuance curve matter much less than
 Its purpose is to provide an economic incentive to get stake rates where the protocol needs them to be (not too high, not too low) and maintaining a large uncorrelated validator set. 
 
 This post is an invitation to steer the discussion towards said properties instead of getting lost with the fine details. If we nail down the properties we will constrain the solution space enough so that almost any function we choose will do the job.
+
+## Addendum: Refined Costs and EIP-8363
+
+Since this post was written, stake capping has materialized as a concrete proposal:
+the [EIP-8363 tapered issuance burn](https://github.com/ethereum/EIPs/pull/12081), which tapers each validator's
+issuance to 0 at a ~50% staking ratio (available as `eip8363_tapered_burn` in
+[curve_picker/candidates.py](curve_picker/candidates.py) and evaluated in [README2.md](README2.md)).
+
+[REFINED_COSTS.md](REFINED_COSTS.md) re-runs the real-yield analysis of this post against that proposal with a more
+detailed cost model: bottom-up USD costs for solo stakers (labor, internet, hardware depreciation), execution-layer
+rewards and their uneven distribution, delegation fees by size, bonded small operators (Lido CSM, Rocket Pool), and the
+viability of those staking programs themselves. The conclusions of this post survive and generally strengthen — the
+centralization window between solo stakers and large delegated stakers is wider than the probes here suggest — with one
+important refinement: because EIP-8363 floors the yield at zero rather than going negative, its stake cap is soft by
+exactly the size of the exogenous (MEV) yield, the failure mode anticipated for capped curves in
+[curve_picker/Analysis.md](curve_picker/Analysis.md) and README2.
+
+Compared with the real yield figure above (which uses this post's original cost probes at 4,000 USD/ETH and no
+exogenous rewards), under the refined model at 2,500 USD/ETH the solo staker's 0% real-yield crossing comes forward
+from ~70-80M to ~52M ETH staked (~63M if ETH returns to 4,000 USD), while delegated stakers' crossings barely move —
+see the figure in the [TL;DR](#tldr) above.

@@ -328,6 +328,19 @@ negative real yield, and so do holders. Where is the money going? HW vendors, IS
 a regime where solo stakers are pushed out of the validator set but LSTs can still be viable. Resulting in a centralization
 threat to the network.
 
+**Refined view.** The plot above uses the original `cost_structure.py` probes (4,000 USD/ETH, hobbyist-priced labor,
+no execution-layer rewards). The same curve under the refined cost model of [REFINED_COSTS.md](REFINED_COSTS.md) —
+bottom-up USD costs, EL rewards with their uneven distribution, delegation fees by size, bonded operators, and a
+2,500 USD/ETH base price — looks like this:
+
+![Ethereum's Real Yields, Refined Costs](refined_costs/plots/real_yields_current_curve.png)
+
+Every observation above survives but the numbers move against solo stakers: their 0% crossing comes forward from ~80M
+to ~52M ETH staked (~63M at 4,000 USD/ETH), while delegated stakers' crossings barely move (~82–90M) — so the regime
+where solo stakers are pushed out while delegated staking thrives begins far earlier, at stake levels only ~50% above
+today's. The ~1.5% LST-over-holding premium floor survives too (EL rewards add ~0.1–0.35% on top of the issuance
+floor).
+
 ### Quadratic Burn Proposal Real Yields
 
 ![Quadratic Burn Proposal Real Yields Plot](plots/quadratic_burn/ethereum_real_yield_with_burn_plot.png)
@@ -372,3 +385,33 @@ validator set.
   has a higher component of fixed costs. If the yield is small enough fixed costs will eat it away. While with very
   low issuance, LSTs remain economically viable until very high stake ratios. Their cost structure is not affected by fixed
   costs and with low issuance the dilution effect that drives real yields down at high stake ratios is reduced
+
+### EIP-8363 Tapered Issuance Burn Real Yields
+
+[EIP-8363](https://github.com/ethereum/EIPs/pull/12081) is the concrete stake-capping proposal now on the table. In its
+permanent (post-transition) state each validator's issuance is reduced by a burn fraction $b = (s / 60.25\text{M})^{3/2}$,
+clamped to 1, which makes the net yield taper linearly in the staking ratio and reach 0 at ~50% of supply:
+
+$y_i(s) = 1 + \frac{2.6 \cdot 64}{\sqrt{s}} \left(1 - \min\left(1, \left(\frac{s}{60.25 \cdot 10^6}\right)^{3/2}\right)\right)$
+
+The curve is available as `eip8363_tapered_burn` in [curve_picker/candidates.py](curve_picker/candidates.py).
+
+![EIP-8363 Real Yields Plot](refined_costs/plots/real_yields_eip8363.png)
+
+Note: this plot uses the refined cost models and expanded staker cohorts of [REFINED_COSTS.md](REFINED_COSTS.md)
+(which also covers execution-layer rewards, delegation economics, and bonded operators like Lido CSM and Rocket Pool),
+rather than the `cost_structure.py` probes used in the plots above.
+
+**Observations:**
+
+- The yield is floored at 0 and never goes negative: in the taxonomy of this note, EIP-8363 is a capped ("baguette")
+curve, not a stake-capping curve with a negative regime. Per the argument in
+[Why are Negative Issuance Yields Needed?](#why-are-negative-issuance-yields-needed), it therefore cannot charge
+exogenous yield: past the saturation point a staker's return is whatever tips, MEV, and restaking pay on top.
+- With exogenous yield modeled explicitly (~0.35% today from tips and MEV), the risk premium a delegated staker earns over
+holding floors at ~0.18% at saturation and never reaches 0. The curve can match required premia down to that floor only;
+below it the stake ratio is unbounded by issuance. Where the equilibrium lands is extremely sensitive in exactly that
+region: a 0.25% required premium equilibrates near 49% staked, a 0.1% premium near 90%.
+- The taper compresses the gap between staker types far better than tempered issuance, but the combination of low
+nominal yields and fixed costs still pushes solo stakers out well before the cap — at today's ETH prices, barely above
+today's stake levels once the transition completes. The full cohort analysis is in [REFINED_COSTS.md](REFINED_COSTS.md).

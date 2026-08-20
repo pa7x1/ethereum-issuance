@@ -14,6 +14,25 @@ def ethereum_issuance_yield(
     return 1.0 + 2.6 * 64 * staked**-0.5
 
 
+def eip8363_tapered_burn(
+    staked: Union[float, npt.NDArray[np.float64]],
+    saturation_balance: float = 60_250_000.,
+) -> Union[float, npt.NDArray[np.float64]]:
+    """
+    The tapered issuance burn proposed in EIP-8363 (ethereum/EIPs#12081), permanent
+    (post-transition) state with BASE_REWARD_FACTOR 64. Each validator's issuance is
+    reduced by a burn fraction b = (D / SATURATION_BALANCE)^(3/2), clamped to 1, which
+    makes the net yield taper linearly in the staking ratio and reach 0 at the
+    saturation balance (~50% of supply). The yield is floored at 0 and never negative,
+    so this is a 'baguette'-type curve in this repo's taxonomy.
+    :param staked: Amount of ETH staked.
+    :param saturation_balance: Total active balance at which the burn reaches 100%.
+    :return: The annualized nominal yield.
+    """
+    burn_fraction = np.minimum(1.0, (staked / saturation_balance) ** 1.5)
+    return 1.0 + 2.6 * 64 * (staked**-0.5) * (1.0 - burn_fraction)
+
+
 def log_burn(
     k: float, b: float, staked: Union[float, npt.NDArray[np.float64]]
 ) -> Union[float, npt.NDArray[np.float64]]:

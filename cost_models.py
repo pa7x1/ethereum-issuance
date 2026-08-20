@@ -72,6 +72,20 @@ EL_REWARDS_ANNUAL_ETH = 120_000.
 SOLO_MEV_CAPTURE = 0.5
 POOLED_MEV_CAPTURE = 1.0
 
+# Validator effectiveness: the fraction of the idealized issuance a validator
+# actually earns. Home-run validators sit visibly below professional
+# operations (beaconcha.in entity beaconscores: Rocket Pool ~96.1%, solo
+# stakers <96.5%, large professional operators >99.5% -- as raised on the
+# EIP-8363 thread, ethereum-magicians.org/t/eip-8363-tapered-issuance-burn/29263/240).
+# This matters greatly under EIP-8363: rewards scale with own effectiveness
+# but the burn is sized on the idealized reward and does not (by design, to
+# preserve duty incentives), so per-validator net issuance is ideal*(e - b).
+# Effectiveness gaps are amplified without bound as the burn fraction b
+# approaches e, and validators with e < 1 cross into negative issuance
+# BEFORE saturation -- the zero floor only exists for perfect performers.
+HOME_EFFECTIVENESS = 0.96
+PRO_EFFECTIVENESS = 0.995
+
 
 @dataclass(frozen=True)
 class StakerCostModel:

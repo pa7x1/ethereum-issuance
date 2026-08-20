@@ -40,6 +40,8 @@ from cost_models import (
     el_reward_yield,
     ETH_PRICE_USD,
     ETH_PRICE_APPRECIATED_USD,
+    HOME_EFFECTIVENESS,
+    PRO_EFFECTIVENESS,
     MODULE_PROGRAM_COST_USD,
     MODULE_PROGRAM_REWARD_SHARE,
     CSM_MODULE_SIZE_ETH,
@@ -72,13 +74,34 @@ STAKE_GRID = np.linspace(3200, CIRCULATING_SUPPLY * 0.99, 20_000)
 PREMIUM_THRESHOLDS = [0.01, 0.005, 0.0025, 0.001]
 
 
+def issuance_yield_at_effectiveness(curve_fn: Callable,
+                                    staked: np.ndarray,
+                                    effectiveness: float) -> np.ndarray:
+    """
+    Per-validator issuance yield at a given effectiveness. Rewards scale with own
+    effectiveness while the EIP-8363 burn is sized on the idealized reward and
+    does not, so the adjustment is gross * (effectiveness - 1) on top of the
+    perfect-performance curve. For the current curve (no burn) this reduces to
+    scaling rewards by effectiveness. Note validators with effectiveness < 1
+    experience negative issuance under EIP-8363 before saturation.
+    """
+    ideal_gross = ethereum_issuance_yield(staked) - 1.
+    return curve_fn(staked) + ideal_gross * (effectiveness - 1.)
+
+
 def refined_real_yield(curve_fn: Callable,
                        model: StakerCostModel,
                        staked: np.ndarray,
-                       eth_price_usd: float = ETH_PRICE_USD) -> np.ndarray:
-    """Real yield of a refined archetype under a given issuance yield curve."""
+                       eth_price_usd: float = ETH_PRICE_USD,
+                       effectiveness: float = 1.0) -> np.ndarray:
+    """
+    Real yield of a refined archetype under a given issuance yield curve.
+    Effectiveness < 1 scales the archetype's own rewards (and, under EIP-8363,
+    leaves the idealized burn unchanged); dilution uses the same per-archetype
+    yield, a negligible approximation at these probe tolerances.
+    """
     return real_staking_yield(
-        issuance_yield=curve_fn(staked),
+        issuance_yield=issuance_yield_at_effectiveness(curve_fn, staked, effectiveness),
         supply=CIRCULATING_SUPPLY,
         staked=staked,
         fixed_cost_ratio=model.fixed_cost_ratio(eth_price_usd),
@@ -244,6 +267,41 @@ def _plot_delegation_pull(curves: list, output_path: Path) -> None:
     plt.close(fig)
 
 
+def _plot_effectiveness_gap(output_path: Path) -> None:
+    """
+    Ratio of a home validator's net issuance to a professional's, per curve.
+    Under the current curve the ratio is the flat effectiveness ratio; under
+    EIP-8363 the idealized burn makes it (e_home - b) / (e_pro - b), which
+    collapses as the burn fraction approaches home effectiveness.
+    """
+    x = np.linspace(5e6, 59.5e6, 5_000)
+    burn_fraction = np.minimum(1.0, (x / 60_250_000.) ** 1.5)
+    ratio_current = np.full_like(x, 100. * HOME_EFFECTIVENESS / PRO_EFFECTIVENESS)
+    ratio_eip = 100. * (HOME_EFFECTIVENESS - burn_fraction) / (PRO_EFFECTIVENESS - burn_fraction)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(x, ratio_current, label="Current Issuance Curve", color=COLOR_SOLO, linewidth=2, linestyle="-")
+    ax.plot(x, ratio_eip, label="EIP-8363 Tapered Burn (permanent)", color=COLOR_SOLO, linewidth=2, linestyle="--")
+
+    zero_at = 60_250_000. * HOME_EFFECTIVENESS ** (2. / 3.)
+    ax.axvline(x=zero_at, color="k", linewidth=0.8, linestyle=":", alpha=0.7)
+    ax.annotate(f"home net issuance = 0 at {zero_at / 1e6:.1f}M\n(negative beyond, pro still positive)",
+                xy=(zero_at, 10), xytext=(zero_at - 1e6, 12), ha="right", fontsize=9, color="k")
+
+    ax.set_title(f"Home Validator Net Issuance as % of a Professional's "
+                 f"({100 * HOME_EFFECTIVENESS:g}% vs {100 * PRO_EFFECTIVENESS:g}% effectiveness)")
+    ax.xaxis.set_major_formatter(FuncFormatter(stake_formatter))
+    ax.set_xlabel("Stake (Millions of ETH)")
+    ax.set_ylabel("Home / Pro Net Issuance (%)")
+    ax.set_ylim(bottom=0, top=105)
+    ax.set_xlim(left=0, right=62e6)
+    ax.grid(True, which="both", linestyle="--", linewidth=0.5, alpha=0.6)
+    ax.legend(fontsize=10)
+
+    fig.savefig(output_path, dpi=fig.dpi)
+    plt.close(fig)
+
+
 def _plot_operator_breakeven(curves: list, output_path: Path) -> None:
     x = np.linspace(5e6, CIRCULATING_SUPPLY * 0.55, 5_000)
     # Fee tiers are an ordered magnitude, so they get a sequential ramp of a
@@ -388,6 +446,26 @@ def main() -> None:
           f" {100. * end_premium:.2f}% at 99% of supply -- never negative (MEV-only floor)")
     print()
 
+    print("Effectiveness and the idealized burn (home {:.1f}% vs pro {:.1f}% effectiveness):".format(
+        100 * HOME_EFFECTIVENESS, 100 * PRO_EFFECTIVENESS))
+    for ratio_label, stake_level in [("today (~28%)", 34e6), ("35%", 42.175e6), ("40%", 48.2e6), ("45%", 54.225e6), ("48%", 57.84e6)]:
+        b = min(1.0, (stake_level / 60_250_000.) ** 1.5)
+        rel_current = HOME_EFFECTIVENESS / PRO_EFFECTIVENESS
+        rel_eip = (HOME_EFFECTIVENESS - b) / (PRO_EFFECTIVENESS - b)
+        print(f"  {ratio_label} staked: home earns {100 * rel_current:.1f}% of pro issuance (current)"
+              f" vs {100 * rel_eip:.1f}% (EIP-8363)")
+    zero_at = 60_250_000. * HOME_EFFECTIVENESS ** (2. / 3.)
+    print(f"  home net issuance crosses 0 at {zero_at / 1e6:.1f}M staked"
+          f" ({100 * zero_at / CIRCULATING_SUPPLY:.1f}%) and is negative beyond -- the zero floor"
+          f" only exists at 100% effectiveness")
+    x = STAKE_GRID
+    for title, curve_fn in curves:
+        base = zero_crossing(x, refined_real_yield(curve_fn, home_staker, x))
+        adj = zero_crossing(x, refined_real_yield(curve_fn, home_staker, x, effectiveness=HOME_EFFECTIVENESS))
+        print(f"  solo real-yield crossing, {title}: {fmt_crossing(base)} at 100% -> {fmt_crossing(adj)}"
+              f" at {100 * HOME_EFFECTIVENESS:g}% effectiveness")
+    print()
+
     print("Node operator break-even delegation (ETH):")
     for stake_level in [34e6, 45e6, 55e6, 58e6]:
         for title, curve_fn in curves:
@@ -399,6 +477,7 @@ def main() -> None:
     for (title, curve_fn), slug in zip(curves, curve_slugs):
         _plot_real_yields(curve_fn, title, PLOTS_DIR / f"real_yields_{slug}.png")
 
+    _plot_effectiveness_gap(PLOTS_DIR / "effectiveness_gap.png")
     _plot_delegate_premium(curves, PLOTS_DIR / "delegate_premium.png")
     _plot_delegation_pull(curves, PLOTS_DIR / "delegation_pull.png")
     _plot_operator_breakeven(curves, PLOTS_DIR / "operator_breakeven.png")
